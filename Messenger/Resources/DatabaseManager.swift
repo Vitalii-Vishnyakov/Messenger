@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseDatabase
+import RealmSwift
 
 final class DatabaseManager {
     static let shared = DatabaseManager()
@@ -18,7 +19,7 @@ final class DatabaseManager {
 //MARK: - Account manager
 extension DatabaseManager {
     
-    public func userExists ( with email : String, complition : @escaping ((Bool) -> Void))  {
+    public func  userExists ( with email : String, complition : @escaping ((Bool) -> Void))  {
         
         
         var safeEmail = email.replacingOccurrences(of: ".", with: "-")
@@ -34,10 +35,17 @@ extension DatabaseManager {
         
     }
     /// insert new user to database
-    public func insertUser (with user : ChatAppUser ){
+    public func insertUser (with user : ChatAppUser ,completion : @escaping (Bool) -> Void){
         
      
-        database.child(user.safeEmail).setValue(["firstName" : user.firstName, "lastName" : user.lastName])
+        database.child(user.safeEmail).setValue(["firstName" : user.firstName, "lastName" : user.lastName]) { error, _ in
+            guard error == nil else {
+                print("failed to write to database")
+                completion(false)
+                return
+            }
+            completion(true)
+        }
         
     }
 }
@@ -50,6 +58,9 @@ struct ChatAppUser{
         var safeEmail = emailAdress.replacingOccurrences(of: ".", with: "-")
         safeEmail = safeEmail.replacingOccurrences(of: "@", with: "^")
         return safeEmail
+    }
+    var profilePicture : String {
+        return "\(safeEmail)_profile_picture.png"
     }
     
 }
