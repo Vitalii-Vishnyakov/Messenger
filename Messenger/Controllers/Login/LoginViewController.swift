@@ -120,6 +120,7 @@ class LoginViewController: UIViewController {
             }
             let user = result.user
             print("Login User \( user)")
+            UserDefaults.standard.set(email, forKey: "email")
             
             
             self?.navigationController?.dismiss(animated: true, completion: nil)
